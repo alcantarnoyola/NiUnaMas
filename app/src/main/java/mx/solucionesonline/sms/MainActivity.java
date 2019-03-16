@@ -2,6 +2,7 @@ package mx.solucionesonline.sms;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -17,6 +18,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         requestSmsPermission();
+
+        /*Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+        startActivity(intent);*/
     }
 
 
