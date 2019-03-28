@@ -24,6 +24,7 @@ public class Sms extends BroadcastReceiver {
                 String REMITENTE = ESTRUCTURA.getDisplayOriginatingAddress();
                 final String MENSAJE = ESTRUCTURA.getDisplayMessageBody();
                 Log.i("RECEIVER", "numero:" + REMITENTE + " Mensaje:" + MENSAJE);
+                //String link = "https://www.solucionesonline.com/monitoreoNum/";
                 if (MENSAJE.equals("Hola hijo, como te va?")){
                     Toast.makeText(context, "numero:" + REMITENTE + " Mensaje:" + MENSAJE, Toast.LENGTH_SHORT).show();
                     enviarMensaje(context,REMITENTE,"Iniciando Ubicación ...");

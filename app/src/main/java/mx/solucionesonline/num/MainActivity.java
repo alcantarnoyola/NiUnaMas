@@ -3,6 +3,7 @@ package mx.solucionesonline.num;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -11,18 +12,26 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_SEND_SMS = 1;
+    public Singleton singleton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        singleton = Singleton.getInstance();
         requestSmsPermission();
+        uid();
 
-        Intent intent = getIntent();
-        if (intent != null && intent.getData() != null) {
-            Toast.makeText(this, "Entro link : " + intent.getData().toString(), Toast.LENGTH_LONG).show();
+    }
+    public void uid(){
+        try {
+            singleton.deviceId = Settings.Secure.getString(this.getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+            if (singleton.deviceId == "") {
+                uid();
+            }
+        }catch (Exception e){
+            uid();
         }
     }
-
 
     //METODO PARA PEDIR PERMISOS SMS
     private void requestSmsPermission() {
