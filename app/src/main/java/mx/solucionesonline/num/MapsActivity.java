@@ -168,7 +168,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        handler.removeMessages(0);
+        handler.removeMessages(0); //detener hilo
         Intent intent = new Intent (MapsActivity.this, MainActivity.class);
         startActivity(intent);
     }

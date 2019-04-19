@@ -29,7 +29,7 @@ public class Sms extends BroadcastReceiver {
                     Toast.makeText(context, "numero:" + REMITENTE + " Mensaje:" + MENSAJE, Toast.LENGTH_SHORT).show();
                     enviarMensaje(context,REMITENTE,"Iniciando Ubicación ...");
                 }
-                    abortBroadcast();
+                abortBroadcast();
 
             }
         }

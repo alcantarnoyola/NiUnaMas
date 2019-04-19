@@ -8,7 +8,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_SEND_SMS = 1;
@@ -20,8 +20,23 @@ public class MainActivity extends AppCompatActivity {
         singleton = Singleton.getInstance();
         requestSmsPermission();
         uid();
-
     }
+
+    public void contactos(View view){
+        Intent intent = new Intent (MainActivity.this, ContactosActivity.class);
+        startActivity(intent);
+    }
+
+    public void mapa(View view){
+        Intent intent = new Intent (MainActivity.this, MapsActivity.class);
+        startActivity(intent);
+    }
+
+    public void alarmas(View view){
+        Intent intent = new Intent (MainActivity.this, AlarmaActivity.class);
+        startActivity(intent);
+    }
+
     public void uid(){
         try {
             singleton.deviceId = Settings.Secure.getString(this.getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);

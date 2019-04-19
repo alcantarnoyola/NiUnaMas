@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        tools:ignore="MissingConstraints">
+        <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:stretchColumns="*"
+        tools:ignore="MissingConstraints">
+            <TableRow>
+                <Button
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btnCancelarAlarma"
+                    android:text="Cancelar"/>
+
+                <Button
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btnGuardarAlarma"
+                    android:text="Guardar" />
+            </TableRow>
+            <TableLayout
+                android:stretchColumns="0">
+                <TableRow>
+                    <TimePicker
+                        android:timePickerMode="spinner"/>
+                </TableRow>
+            </TableLayout>
+            <TableLayout
+                android:stretchColumns="0">
+                <CheckedTextView android:id="@+id/domingo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:textColor="#000"
+                    android:textSize="16dp"
+                    android:text="Todos los domingos"
+                    android:onClick="onCheckboxClicked"/>
+                <CheckedTextView android:id="@+id/lunes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:textColor="#000"
+                    android:textSize="16dp"
+                    android:text="Todos los lunes"
+                    android:onClick="onCheckboxClicked"/>
+                <CheckedTextView android:id="@+id/martes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:textColor="#000"
+                    android:textSize="16dp"
+                    android:text="Todos los martes"
+                    android:onClick="onCheckboxClicked"/>
+                <CheckedTextView android:id="@+id/miercoles"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:textColor="#000"
+                    android:textSize="16dp"
+                    android:text="Todos los miercoles"
+                    android:onClick="onCheckboxClicked"/>
+                <CheckedTextView android:id="@+id/jueves"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:textColor="#000"
+                    android:textSize="16dp"
+                    android:text="Todos los jueves"
+                    android:onClick="onCheckboxClicked"/>
+                <CheckedTextView android:id="@+id/vienes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:textColor="#000"
+                    android:textSize="16dp"
+                    android:text="Todos los viernes"
+                    android:onClick="onCheckboxClicked"/>
+                <CheckedTextView android:id="@+id/sabado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:textColor="#000"
+                    android:textSize="16dp"
+                    android:text="Todos los sabados"
+                    android:onClick="onCheckboxClicked"/>
+            </TableLayout>
+        </TableLayout>
+    </LinearLayout>
+
+
+
+
+
+</android.support.constraint.ConstraintLayout>
