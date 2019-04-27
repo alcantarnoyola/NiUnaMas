@@ -24,7 +24,7 @@
         <activity android:name=".AlarmaActivity"></activity>
         <activity
             android:name=".SplashScreen"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
+            android:theme="@style/AppTheme.MiNoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -54,7 +54,7 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity> <!-- Broadcast Sms -->
+            android:theme="@style/AppTheme.MiNoActionBar"></activity> <!-- Broadcast Sms -->
         <receiver
             android:name=".Sms"
             android:enabled="true"

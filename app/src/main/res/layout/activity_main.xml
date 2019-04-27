@@ -4,10 +4,113 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#eae6ca"
+    android:background="#fff"
     tools:context=".MainActivity">
 
-    <Button
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp"
+        android:stretchColumns="0,1">
+        <TableRow>
+            <ImageButton
+                android:id="@+id/activityMaps"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:scaleType="fitCenter"
+                android:background="@android:color/transparent"
+                android:onClick="mapa"
+                android:src="@drawable/mapa"/>
+            <ImageButton
+                android:id="@+id/activityContactos"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:scaleType="fitCenter"
+                android:background="@android:color/transparent"
+                android:onClick="contactos"
+                android:src="@drawable/contactos"/>
+        </TableRow>
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:stretchColumns="0,1">
+            <TableRow>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Localización"
+                    android:textAlignment="center"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Mis Contactos"
+                    android:textAlignment="center"/>
+            </TableRow>
+            <TableRow
+                android:layout_marginTop="30dp">
+                    <ImageButton
+                        android:id="@+id/activityAlarma"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:scaleType="fitCenter"
+                        android:background="@android:color/transparent"
+                        android:onClick="alarmas"
+                        android:src="@drawable/alarma"/>
+                    <ImageButton
+                        android:id="@+id/activity"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:scaleType="fitCenter"
+                        android:background="@android:color/transparent"
+                        android:onClick="alarmas"
+                        android:src="@drawable/send_mensaje"/>
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Programar Alarmas"
+                    android:textAlignment="center"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Enviar mensaje"
+                    android:textAlignment="center"/>
+            </TableRow>
+            <TableRow android:layout_marginTop="30dp">
+                <ImageButton
+                    android:id="@+id/activityAlarma"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:scaleType="fitCenter"
+                    android:background="@android:color/transparent"
+                    android:onClick="alarmas"
+                    android:src="@drawable/soporte"/>
+                <ImageButton
+                    android:id="@+id/activity"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:scaleType="fitCenter"
+                    android:background="@android:color/transparent"
+                    android:onClick="alarmas"
+                    android:src="@drawable/config"/>
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Soporte o sugerencias"
+                    android:textAlignment="center"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Configuración"
+                    android:textAlignment="center"/>
+            </TableRow>
+        </TableLayout>
+    </TableLayout>
+
+    <!-- <Button
         android:id="@+id/activityContactos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,6 +137,6 @@
         android:layout_marginBottom="-151dp"
         android:onClick="alarmas"
         android:text="Alarmas programadas"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints" />-->
 
 </RelativeLayout>

@@ -3,6 +3,7 @@
     <string name="title_activity_maps">Localización</string>
     <string name="contacto_name">Nombre</string>
     <string name="contacto_numero">Número</string>
+    <string name="check">CheckedTextView</string>
     <string name="pre_msg">CheckedTextView is</string>
     <string name="checked">checked</string>
     <string name="unchecked">unchecked</string>

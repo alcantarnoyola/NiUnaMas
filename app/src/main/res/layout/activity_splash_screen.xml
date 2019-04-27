@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SplashScreen"
-    android:background="#000000"
+    android:background="#FF86E3"
     >
 
     <RelativeLayout
@@ -14,9 +14,13 @@
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:src="@drawable/logo" />
+            android:src="@drawable/titulo"
+            android:minWidth="10dp"
+            android:minHeight="10dp"
+            android:maxWidth="20dp"
+            android:maxHeight="20dp"/>
 
     </RelativeLayout>
 
