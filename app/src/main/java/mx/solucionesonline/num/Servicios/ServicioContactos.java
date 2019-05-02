@@ -95,7 +95,7 @@ public class ServicioContactos extends AsyncTask<String, Integer, JSONObject> {
             pairs.add(new BasicNameValuePair("nombre",singelton.nombreContacto));
             pairs.add(new BasicNameValuePair("numero",singelton.numeroContacto));
             pairs.add(new BasicNameValuePair("accion",String.valueOf(singelton.selectOper)));
-            post.setEntity(new UrlEncodedFormEntity(pairs));
+            post.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8"));
             HttpResponse httpResponse = client.execute(post);
             int status = httpResponse.getStatusLine().getStatusCode();
 

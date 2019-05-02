@@ -57,19 +57,19 @@
                         android:onClick="alarmas"
                         android:src="@drawable/alarma"/>
                     <ImageButton
-                        android:id="@+id/activity"
+                        android:id="@+id/btn_send_mensaje"
                         android:layout_width="100dp"
                         android:layout_height="100dp"
                         android:scaleType="fitCenter"
                         android:background="@android:color/transparent"
-                        android:onClick="alarmas"
+                        android:onClick="send_mensaje"
                         android:src="@drawable/send_mensaje"/>
             </TableRow>
             <TableRow>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Programar Alarmas"
+                    android:text="Programar Alertas"
                     android:textAlignment="center"/>
                 <TextView
                     android:layout_width="match_parent"
@@ -79,7 +79,7 @@
             </TableRow>
             <TableRow android:layout_marginTop="30dp">
                 <ImageButton
-                    android:id="@+id/activityAlarma"
+                    android:id="@+id/btn_soporte"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:scaleType="fitCenter"
@@ -87,7 +87,7 @@
                     android:onClick="alarmas"
                     android:src="@drawable/soporte"/>
                 <ImageButton
-                    android:id="@+id/activity"
+                    android:id="@+id/btn_configuracion"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:scaleType="fitCenter"

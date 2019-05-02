@@ -1,6 +1,7 @@
 package mx.solucionesonline.num;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
@@ -11,6 +12,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -31,7 +34,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public boolean firstMarker = false;
     public int seconds = 0;
     public Marker marcador;
+    public Marker marcadorCuidador;
     public Handler handler;
+    public  CameraPosition cameraPosition;
+    public boolean moverCamara = true;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +50,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             coordsReceived = intent.getData().toString().split("/");
             singleton.coordLat = Double.parseDouble(coordsReceived[4].split(",")[0]);
             singleton.coordLon = Double.parseDouble(coordsReceived[4].split(",")[1]);
-            Toast.makeText(this, "Coordenadas recibidas: " + singleton.coordLat + "*****" + singleton.coordLon, Toast.LENGTH_LONG).show();
+            singleton.deviceIdRecibido = String.valueOf(coordsReceived[4].split(",")[2]);
+            singleton.statusAlertSms = true;
+            moverCamara = true;
+            Toast.makeText(this, "Coordenadas recibidas: " + singleton.coordLat + "*****" + singleton.coordLon + "*****" + singleton.deviceIdRecibido, Toast.LENGTH_LONG).show();
         }//fin de recoger lo recibido por activity
         handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -53,7 +62,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 execThread();//realizamos todo el proceso de generacion de markers
                 handler.postDelayed(this, 1000);//se ejecutara cada 1 segundos
             }
-        }, 0);//empezara a ejecutarse después de 5 milisegundos
+        }, 0);//empezara a ejecutarse después de 0 milisegundos
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -61,55 +70,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
+    public void centrarCamara(){
+        cameraPosition = CameraPosition.builder().target(
+                new LatLng(singleton.lat, singleton.lon)).zoom(16).bearing(0).tilt(45).build(); //asignamos coords a centrar el mapa
+        singleton.mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        moverCamara = false;
+    }
+
     public void execThread(){
-        if (singleton.mMap != null && !firstMarker) {
-            firstMarker = true;
+        if (singleton.mMap != null && singleton.statusAlertSms) {
             // al abrir activity mostramos coordenada recogida por sms
-            marcador = singleton.mMap.addMarker(new MarkerOptions().position(new LatLng(singleton.coordLat, singleton.coordLon)).title("Objetivo")); //creamos marker
-        }else if (firstMarker){
             seconds += 1000;
-            if (seconds > 15000) {
-                if (marcador != null){//borramos markador
+            if (seconds > 15000 && singleton.statusAlertSms) {
+                if (marcador != null) {//borramos markador
                     marcador.remove();
                 }
                 seconds = 0;
                 coordsReceived();
-                marcador = singleton.mMap.addMarker(new MarkerOptions().position(new LatLng(singleton.coordLat, singleton.coordLon)).title("Objetivo3")); //creamos marker
+                marcador = singleton.mMap.addMarker(new MarkerOptions().position(new LatLng(singleton.coordLat, singleton.coordLon)).title("Objetivo")); //creamos marker
+            }
+            if(moverCamara)
+                centrarCamara();
+
+        }
+        if (singleton.mMap != null) {
+            if (marcadorCuidador != null) {//borramos markador
+                marcadorCuidador.remove();
+            }
+
+            if(singleton.lat != 0 && singleton.lon != 0) {
+                marcadorCuidador = singleton.mMap.addMarker(new MarkerOptions().position(new LatLng(singleton.lat, singleton.lon)).title("Cuidador")); //creamos marker
+                if(moverCamara)
+                    centrarCamara();
             }
         }
-        /*
-        coord = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true){
-                    if (singleton.mMap != null && !firstMarker) {
-                        firstMarker = true;
-                        // al abrir activity mostramos coordenada recogida por sms
-                        marcador = singleton.mMap.addMarker(new MarkerOptions().position(new LatLng(singleton.coordLat, singleton.coordLon)).title("Objetivo")); //creamos marker
-                    }
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    seconds += 1000;
-                    if (seconds > 15000){
-                        Toast.makeText(MapsActivity.this, "Remove", Toast.LENGTH_SHORT).show();
-                        seconds = 0;
-                        marcador.remove();
-                        //Realizamos peticion http
-                        coordsReceived();
-                    }
-                }
-            }
-        });
-        coord.start();*/
     }
 
     public void coordsReceived(){
         URL url = null;
         try {
-            url = new URL("https://solucionesonline.mx/apps_moviles/monitoreoNum/coordsMapaApp.php?device="+singleton.deviceId);
+            url = new URL("https://solucionesonline.mx/apps_moviles/monitoreoNum/coordsMapaApp.php?device="+singleton.deviceIdRecibido);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -159,18 +159,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (singleton.mMap == null) {
             singleton.mMap = googleMap;
             singleton.mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-            CameraPosition cameraPosition = CameraPosition.builder().target(
-                    new LatLng(singleton.coordLat,singleton.coordLon)).zoom(16).bearing(0).tilt(45).build(); //asignamos coords a centrar el mapa
-            singleton.mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
+
+        if(singleton.statusAlertSms){
+            singleton.mMap = googleMap;
+            singleton.mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            centrarCamara();
+        }
+    }
+    // method definition
+    public BitmapDescriptor getMarkerIcon(String color) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(Color.parseColor(color), hsv);
+        return BitmapDescriptorFactory.defaultMarker(hsv[0]);
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         handler.removeMessages(0); //detener hilo
-        Intent intent = new Intent (MapsActivity.this, MainActivity.class);
-        startActivity(intent);
     }
 
     public void uid(){

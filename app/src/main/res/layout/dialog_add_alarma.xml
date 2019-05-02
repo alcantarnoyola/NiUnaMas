@@ -30,7 +30,8 @@
                 android:stretchColumns="0">
                 <TableRow>
                     <TimePicker
-                        android:timePickerMode="spinner"/>
+                        android:id="@+id/timepicker"
+                        android:timePickerMode="spinner" />
                 </TableRow>
             </TableLayout>
             <TableLayout
