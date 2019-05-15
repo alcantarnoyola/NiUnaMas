@@ -16,19 +16,26 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import mx.solucionesonline.num.SQLite.ConexionSQLite;
 import mx.solucionesonline.num.Servicios.ServicioContactos;
+import mx.solucionesonline.num.Servicios.ServicioEnvioSms;
+import mx.solucionesonline.num.Servicios.ServicioSoporteSugerencias;
 import mx.solucionesonline.num.Servicios.UbicacionGps;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ServicioEnvioSms.IServicioEnvioSms, ServicioSoporteSugerencias.IServicioSoporteSugerencias {
     private static final int PERMISSION_SEND_SMS = 1;
     private static final int PERMISSION_GPS = 2;
     public Singleton singleton;
     public UbicacionGps ubicacionGps;
+    private AlertDialog dialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +67,14 @@ public class MainActivity extends AppCompatActivity {
         dialogSendMensaje();
     }
 
+    public void soporte_sugerencias(View view){
+        dialogSoporteSugerencias();
+    }
+
+    public void configuracion(View view){
+        Intent intent = new Intent (MainActivity.this, ConfigActivity.class);
+        startActivity(intent);
+    }
     public void uid(){
         try {
             singleton.deviceId = Settings.Secure.getString(this.getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -128,32 +143,75 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void dialogSendMensaje(){
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-        final LayoutInflater inflater = this.getLayoutInflater();
-        final View dialogView = inflater.inflate(R.layout.dialog_send_mensaje, null);
-        Spinner spinner = dialogView.findViewById(R.id.contactos_spinner);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, singleton.arrayListContactos);
-        spinner.setAdapter(adapter);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setView(R.layout.dialog_send_mensaje);
+        dialog = builder.create();
+        dialog.setCancelable(false);
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(null);
+        final Button btn_aceptar = dialog.findViewById(R.id.btn_aceptar);
+        final Button btn_cancelar = dialog.findViewById(R.id.btn_cancelar);
+        Spinner spinner = dialog.findViewById(R.id.contactos_spinner);
+        List<String> list = new ArrayList<String>();
+        list.add("Alcantar");
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, list);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(dataAdapter);
 
-        alertDialog.setView(dialogView)
-                // Add action buttons
-                .setPositiveButton("Agregar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        Toast.makeText(MainActivity.this, "Entro", Toast.LENGTH_SHORT).show();
+        btn_aceptar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
 
-                    }
-                })
-                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                    }
-                });
-        alertDialog.show();
+        btn_cancelar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
 
     }
 
+    public void dialogSoporteSugerencias(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setView(R.layout.dialog_soporte_sugerencia);
+        dialog = builder.create();
+        dialog.setCancelable(false);
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(null);
+        final Button btn_aceptar = dialog.findViewById(R.id.btn_aceptar);
+        final Button btn_cancelar = dialog.findViewById(R.id.btn_cancelar);
+        final EditText name = dialog.findViewById(R.id.edit_name);
+        final EditText number = dialog.findViewById(R.id.edit_number);
+        final EditText message = dialog.findViewById(R.id.edit_message);
+        btn_aceptar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, ""+name+"::"+number+"::"+message, Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
 
+        btn_cancelar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+    }
+
+    @Override
+    public void servicioEnvioSmsFinished(int error, String response) {
+
+    }
+
+    @Override
+    public void servicioSoporteSugerenciasFinished(int error, String response) {
+
+    }
 }

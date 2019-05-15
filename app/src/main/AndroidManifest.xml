@@ -8,13 +8,13 @@
          location permissions for the 'MyLocation' functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.WRITE_SMS" />
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -23,8 +23,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AlarmaActivity"
-            android:theme="@style/AppTheme.MiNoActionBar"></activity>
+        <activity android:name=".ConfigActivity"
+            android:theme="@style/AppTheme.MiNoActionBar" ></activity>
+        <activity
+            android:name=".AlarmaActivity"
+            android:theme="@style/AppTheme.MiNoActionBar" />
         <activity
             android:name=".SplashScreen"
             android:theme="@style/AppTheme.MiNoActionBar">
@@ -34,8 +37,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ContactosActivity"
-            android:theme="@style/AppTheme.MiNoActionBar"/>
+        <activity
+            android:name=".ContactosActivity"
+            android:theme="@style/AppTheme.MiNoActionBar" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -59,7 +63,7 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:theme="@style/AppTheme.MiNoActionBar"></activity> <!-- Broadcast Sms -->
+            android:theme="@style/AppTheme.MiNoActionBar" /> <!-- Broadcast Sms -->
         <receiver
             android:name=".Sms"
             android:enabled="true"

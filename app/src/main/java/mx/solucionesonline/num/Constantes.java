@@ -24,5 +24,5 @@ public class Constantes {
                                                                             + CAMPO_JUEVES + " INT, "
                                                                             + CAMPO_VIERNES + " INT, "
                                                                             + CAMPO_SABADO + " INT, "
-                                                                            + CAMPO_ACTIVADO + " INT)";
+                                                                            + CAMPO_ACTIVADO + " BOOLEAN)";
 }

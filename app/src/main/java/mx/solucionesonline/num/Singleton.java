@@ -35,7 +35,9 @@ public class Singleton {
     public List<HashMap<String, String>> lista_hashmap_alarmas = new ArrayList<HashMap<String, String>>();
     public HashMap<String, Integer> diasSemana = new HashMap<String, Integer>();
     public String horaAlarma = "";
-    public int activado = 0;
+    public boolean activado = false;
+    public int posicionAlarma;
+    public ArrayList<String> lista_alarmas = new ArrayList<String>();
 
     //Variables para ubicacion gps
     public double lat = 0;
@@ -43,9 +45,6 @@ public class Singleton {
 
     //sqlite
     public ConexionSQLite conn;
-
-    //variables globales
-    public int guardarPosicion = 0;
 
     //creamos solamente una vez la clase
     public Singleton(){
@@ -57,11 +56,6 @@ public class Singleton {
         hm.put("Numero", "4441242655");
         hm.put("Imagen", String.valueOf(R.drawable.contacto_generico));
         lista_hashmap.add(hm);
-
-        //ALARMA DE PRUEBA, SE QUITARA CUANDO SE AGREGE POR SQLITE
-        HashMap<String, String> hm_alarma = new HashMap<String, String>();
-        hm_alarma.put("Hora", "08:45");
-        lista_hashmap_alarmas.add(hm_alarma);
 
         //Asignar dias de la semana
         diasSemana.put("domingos",0);

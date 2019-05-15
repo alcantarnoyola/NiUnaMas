@@ -84,7 +84,7 @@
                     android:layout_height="100dp"
                     android:scaleType="fitCenter"
                     android:background="@android:color/transparent"
-                    android:onClick="alarmas"
+                    android:onClick="soporte_sugerencias"
                     android:src="@drawable/soporte"/>
                 <ImageButton
                     android:id="@+id/btn_configuracion"
@@ -92,7 +92,7 @@
                     android:layout_height="100dp"
                     android:scaleType="fitCenter"
                     android:background="@android:color/transparent"
-                    android:onClick="alarmas"
+                    android:onClick="configuracion"
                     android:src="@drawable/config"/>
             </TableRow>
             <TableRow>
