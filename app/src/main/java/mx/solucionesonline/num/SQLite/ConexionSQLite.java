@@ -16,12 +16,15 @@ public class ConexionSQLite extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+
         db.execSQL(Constantes.CREAR_TABLA_ALARMA);
+        db.execSQL(Constantes.CREAR_TABLA_CONTACTOS);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS alarmas"); //si existe la borramos cuando se instala la nueva version
+        db.execSQL("DROP TABLE IF EXISTS contactos"); //si existe la borramos cuando se instala la nueva version
         onCreate(db); //creamos la tabla
     }
 }

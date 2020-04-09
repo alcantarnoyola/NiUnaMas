@@ -1,6 +1,12 @@
 package mx.solucionesonline.num;
 
+import android.content.Context;
+import android.location.LocationListener;
+import android.location.LocationManager;
+
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.Polyline;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,17 +24,20 @@ public class Singleton {
 
     //variables para mapa
     public GoogleMap mMap = null;
+    public GoogleMap auxMap = null;
     public double coordLat = 0;
     public double coordLon = 0;
     public boolean statusAlertSms = false;
+    public Polyline polyline = null;
+    public Marker markerObjetivo = null;
 
     //variables para contactos
     public String nombreContacto = "";
     public String numeroContacto = "";
     public int selectOper;
     public int posicionContacto;
-    public ArrayList<String> arrayListContactos;
-    public List<HashMap<String, String>> lista_hashmap = new ArrayList<HashMap<String, String>>();
+    public List<String> lista_contactos = new ArrayList<String>();;
+    public List<HashMap<String, String>> lista_hashmap_contactos = new ArrayList<HashMap<String, String>>();
 
 
     //variables para alarmas
@@ -42,20 +51,31 @@ public class Singleton {
     //Variables para ubicacion gps
     public double lat = 0;
     public double lon = 0;
+    public LocationManager locationManager;
+    public LocationListener locationListener;
+    public int opcionUbicacion = 0;
+    //variables para soporte
+    public String nombreSoporte = "";
+    public String mensajeSoporte = "";
+
+    //variables para config
+    public ArrayList<String> menu =  new ArrayList<String>();
+    public String nombre = "";
+    public String apellidos = "";
+    public String email = "";
+    public String colonia = "";
+    public String municipio = "";
+    public String estado = "";
+    public String gradoestudios = "";
+    public ArrayList<String> lista_gradoestudios =  new ArrayList<String>();
+
+    public Context context;
 
     //sqlite
     public ConexionSQLite conn;
 
     //creamos solamente una vez la clase
     public Singleton(){
-        arrayListContactos = new ArrayList<String>();
-        arrayListContactos.add("Contacto 1566656");
-        //CONTACTO DE PRUEBA, SE QUITARA CUANDO SE AGREGUE EL PRIMER CONTACTO EN SPLASH
-        HashMap<String, String> hm = new HashMap<String, String>();
-        hm.put("Nombre", "Alcantar");
-        hm.put("Numero", "4441242655");
-        hm.put("Imagen", String.valueOf(R.drawable.contacto_generico));
-        lista_hashmap.add(hm);
 
         //Asignar dias de la semana
         diasSemana.put("domingos",0);
@@ -66,6 +86,24 @@ public class Singleton {
         diasSemana.put("viernes",0);
         diasSemana.put("sabados",0);
 
+        //Asignar menu
+        menu.add("Completa tu perfil");
+        menu.add("Aviso de privacidad");
+        menu.add("Acerca de");
+        menu.add("Equipo Soon");
+
+        //asignar grados de estudio
+        lista_gradoestudios.add("Seleccione una opción");
+        lista_gradoestudios.add("1.- Primaria");
+        lista_gradoestudios.add("2.- Secundaria");
+        lista_gradoestudios.add("3.- Bachillerato");
+        lista_gradoestudios.add("4.- Profecional técnica");
+        lista_gradoestudios.add("5.- Técnico superior");
+        lista_gradoestudios.add("6.- Licenciatura");
+        lista_gradoestudios.add("7.- Posgrado");
+        lista_gradoestudios.add("8.- Especialidad");
+        lista_gradoestudios.add("9.- Maestría");
+        lista_gradoestudios.add("10.- Doctorado");
 
     }
 

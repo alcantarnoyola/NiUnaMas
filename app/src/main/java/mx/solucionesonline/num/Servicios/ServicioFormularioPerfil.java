@@ -19,10 +19,10 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
-public class ServicioSoporteSugerencias extends AsyncTask<String, Integer, JSONObject> {
+public class ServicioFormularioPerfil extends AsyncTask<String, Integer, JSONObject> {
 
     private TCP tcp;
-    private ServicioSoporteSugerencias.IServicioSoporteSugerencias delegate;
+    private ServicioFormularioPerfil.IServicioFormularioPerfil delegate;
     private int error;
     private String response;
     public static String mResponseDesc;
@@ -33,28 +33,28 @@ public class ServicioSoporteSugerencias extends AsyncTask<String, Integer, JSONO
     public HttpClient client;
     HttpPost post;
 
-    public ServicioSoporteSugerencias(ServicioSoporteSugerencias.IServicioSoporteSugerencias ctx) {
+    public ServicioFormularioPerfil(ServicioFormularioPerfil.IServicioFormularioPerfil ctx) {
         singelton = Singleton.getInstance();
         delegate = ctx;
         /*tcp = new TCP(singelton.ip, singelton.port);
         tcp.setTimeOut(25000);
         tcp.setSoTimeOut(25000);*/
         client = new DefaultHttpClient();
-        String url="https://www.solucionesonline.mx/apps_moviles/monitoreoNum/storedProcedure/spSoporte.php";
+        String url="https://www.solucionesonline.mx/apps_moviles/monitoreoNum/storedProcedure/spFormularioPerfil.php";
         post = new HttpPost(url);
     }
 
     /**
      * Interface para manejar respuesta
      */
-    public interface IServicioSoporteSugerencias {
+    public interface IServicioFormularioPerfil {
         /**
          * Se mandó paquete para Loguearse en la aplicación
          *
          * @param error
          * @param response
          */
-        void servicioSoporteSugerenciasFinished(int error, String response);
+        void servicioFormularioPerfilFinished(int error, String response);
     }
 
     @Override
@@ -66,15 +66,13 @@ public class ServicioSoporteSugerencias extends AsyncTask<String, Integer, JSONO
                     error = ERROR_COMM;
                     response = "Error de comunicación con servidor";
                 }
-                singelton.nombreSoporte = result.getString("nombre");
-                singelton.mensajeSoporte = result.getString("mensaje");
-                delegate.servicioSoporteSugerenciasFinished(error, response);
+                delegate.servicioFormularioPerfilFinished(error, response);
             }
         }catch (Exception e){
             e.printStackTrace();
             error = ERROR_COMM;
             response = "Error de comunicación con servidor 2";
-            delegate.servicioSoporteSugerenciasFinished(error, response);
+            delegate.servicioFormularioPerfilFinished(error, response);
         }
     }
 
@@ -91,8 +89,13 @@ public class ServicioSoporteSugerencias extends AsyncTask<String, Integer, JSONO
         try {
             List<NameValuePair> pairs = new ArrayList<NameValuePair>();
             pairs.add(new BasicNameValuePair("device",singelton.deviceId));
-            pairs.add(new BasicNameValuePair("nombre",singelton.nombreSoporte));
-            pairs.add(new BasicNameValuePair("mensaje",singelton.mensajeSoporte));
+            pairs.add(new BasicNameValuePair("nombre",singelton.nombre));
+            pairs.add(new BasicNameValuePair("apellidos",singelton.apellidos));
+            pairs.add(new BasicNameValuePair("email",singelton.email));
+            pairs.add(new BasicNameValuePair("colonia",singelton.colonia));
+            pairs.add(new BasicNameValuePair("municipio",singelton.municipio));
+            pairs.add(new BasicNameValuePair("estado",singelton.estado));
+            pairs.add(new BasicNameValuePair("gradoestudios",singelton.gradoestudios));
             post.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8"));
             HttpResponse httpResponse = client.execute(post);
             int status = httpResponse.getStatusLine().getStatusCode();
@@ -104,7 +107,6 @@ public class ServicioSoporteSugerencias extends AsyncTask<String, Integer, JSONO
                 error = SUCCESS;
                 response = "OK";
                 return last;
-
             }
         }catch (Exception e){
             e.printStackTrace();

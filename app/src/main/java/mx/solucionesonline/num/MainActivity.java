@@ -44,8 +44,14 @@ public class MainActivity extends AppCompatActivity implements ServicioEnvioSms.
         ubicacionGps = new UbicacionGps(MainActivity.this);
         requestSmsPermission();
         uid();
+        singleton.context = MainActivity.this;
 
         singleton.conn = new ConexionSQLite(this, "num",null,1);
+        /*try {
+            requestGpsPermission();
+        }catch (Exception e){
+            e.printStackTrace();
+        }*/
     }
 
     public void contactos(View view){
@@ -54,9 +60,33 @@ public class MainActivity extends AppCompatActivity implements ServicioEnvioSms.
     }
 
     public void mapa(View view){
-        Intent intent = new Intent (MainActivity.this, MapsActivity.class);
-        startActivity(intent);
+        if(!singleton.locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER )){
+            showAlert();
+        }else{
+            Intent intent = new Intent (MainActivity.this, MapsActivity.class);
+            startActivity(intent);
+        }
     }
+    private void showAlert() {
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("Gps desactivado")
+                .setMessage("Por favor active su ubicación")
+                .setPositiveButton("Activar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                        Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(myIntent);
+                    }
+                }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).
+                setCancelable(false);
+        dialog.show();
+    }
+
 
     public void alarmas(View view){
         Intent intent = new Intent (MainActivity.this, AlarmaActivity.class);
@@ -109,9 +139,9 @@ public class MainActivity extends AppCompatActivity implements ServicioEnvioSms.
                     PERMISSION_GPS);
         } else {
             // permission already granted
-            LocationManager milocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            LocationListener milocListener = new UbicacionGps(MainActivity.this);
-            milocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, milocListener);
+            singleton.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            singleton.locationListener = new UbicacionGps(MainActivity.this);
+            singleton.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 9000, 0, singleton.locationListener);
         }
     }
 
@@ -152,18 +182,20 @@ public class MainActivity extends AppCompatActivity implements ServicioEnvioSms.
         dialog.getWindow().setBackgroundDrawable(null);
         final Button btn_aceptar = dialog.findViewById(R.id.btn_aceptar);
         final Button btn_cancelar = dialog.findViewById(R.id.btn_cancelar);
-        Spinner spinner = dialog.findViewById(R.id.contactos_spinner);
-        List<String> list = new ArrayList<String>();
-        list.add("Alcantar");
+        final Spinner spinner = dialog.findViewById(R.id.contactos_spinner);
+        llenarListaMensajes();
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, list);
+                android.R.layout.simple_spinner_item, singleton.lista_contactos);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(dataAdapter);
 
         btn_aceptar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialog.dismiss();
+                String data = spinner.getSelectedItem().toString();
+                singleton.posicionContacto = Integer.parseInt(data.split(".-")[0]) -1;
+                ServicioEnvioSms servicioEnvioSms = new ServicioEnvioSms(MainActivity.this);
+                servicioEnvioSms.execute("");
             }
         });
 
@@ -176,6 +208,17 @@ public class MainActivity extends AppCompatActivity implements ServicioEnvioSms.
 
     }
 
+    private void llenarListaMensajes() {
+        //sumamos uno para darle vista
+        if (singleton.lista_contactos.size() > 0){
+            singleton.lista_contactos.clear();
+        }
+        for(int i=0; i<singleton.lista_hashmap_contactos.size(); i++){
+            singleton.lista_contactos.add((i+1)+".- " + singleton.lista_hashmap_contactos.listIterator(i).next().get(Constantes.CAMPO_NOMBRE) + " : " +
+                    singleton.lista_hashmap_contactos.listIterator(i).next().get(Constantes.CAMPO_NUMERO));
+        }
+    }
+
     public void dialogSoporteSugerencias(){
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setView(R.layout.dialog_soporte_sugerencia);
@@ -186,13 +229,14 @@ public class MainActivity extends AppCompatActivity implements ServicioEnvioSms.
         final Button btn_aceptar = dialog.findViewById(R.id.btn_aceptar);
         final Button btn_cancelar = dialog.findViewById(R.id.btn_cancelar);
         final EditText name = dialog.findViewById(R.id.edit_name);
-        final EditText number = dialog.findViewById(R.id.edit_number);
         final EditText message = dialog.findViewById(R.id.edit_message);
         btn_aceptar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, ""+name+"::"+number+"::"+message, Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
+                singleton.nombreSoporte = name.getText().toString();
+                singleton.mensajeSoporte = message.getText().toString();
+                ServicioSoporteSugerencias servicioSoporteSugerencias = new ServicioSoporteSugerencias(MainActivity.this);
+                servicioSoporteSugerencias.execute("");
             }
         });
 
@@ -207,11 +251,22 @@ public class MainActivity extends AppCompatActivity implements ServicioEnvioSms.
 
     @Override
     public void servicioEnvioSmsFinished(int error, String response) {
+        dialog.dismiss();
+        if (error == ServicioEnvioSms.SUCCESS){
+            Toast.makeText(this, "Sms enviado correctamente, en breve recibira su ubicación", Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(this, "Ha ocurrrido un error, intenta más tarde", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
     @Override
     public void servicioSoporteSugerenciasFinished(int error, String response) {
-
+        dialog.dismiss();
+        if (error == ServicioSoporteSugerencias.SUCCESS){
+            Toast.makeText(this, "Gracias por contactarnos", Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(this, "Ha ocurrrido un error, intenta más tarde", Toast.LENGTH_SHORT).show();
+        }
     }
 }

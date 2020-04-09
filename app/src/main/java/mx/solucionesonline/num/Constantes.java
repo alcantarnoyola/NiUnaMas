@@ -4,8 +4,11 @@ public class Constantes {
 
     //tabla alarmas
     public static final String NAME_TABLA_ALARMAS = "alarmas";
+    public static final String NAME_TABLA_CONTACTOS = "contactos";
     public static final String CAMPO_ID = "id";
     public static final String CAMPO_HORA = "hora";
+    public static final String CAMPO_NOMBRE = "nombre";
+    public static final String CAMPO_NUMERO = "numero";
     public static final String CAMPO_DOMINGO = "domingo";
     public static final String CAMPO_LUNES = "lunes";
     public static final String CAMPO_MARTES = "martes";
@@ -25,4 +28,8 @@ public class Constantes {
                                                                             + CAMPO_VIERNES + " INT, "
                                                                             + CAMPO_SABADO + " INT, "
                                                                             + CAMPO_ACTIVADO + " BOOLEAN)";
+
+    public static final String CREAR_TABLA_CONTACTOS = "CREATE TABLE contactos ("+ CAMPO_ID + " INT NOT NULL PRIMARY KEY, "
+            + CAMPO_NOMBRE + " TEXT, "
+            + CAMPO_NUMERO + " TEXT)";
 }

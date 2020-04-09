@@ -19,42 +19,42 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
-public class ServicioSoporteSugerencias extends AsyncTask<String, Integer, JSONObject> {
+public class ServicioMaps extends AsyncTask<String, Integer, JSONObject> {
 
     private TCP tcp;
-    private ServicioSoporteSugerencias.IServicioSoporteSugerencias delegate;
+    private ServicioMaps.IServicioMaps delegate;
     private int error;
     private String response;
     public static String mResponseDesc;
-    private Singleton singelton;
+    private Singleton singleton;
     public static final int SUCCESS = 0;
     public static final int CONEXION_BD = 1;
     public static final int ERROR_COMM = 99;
     public HttpClient client;
     HttpPost post;
 
-    public ServicioSoporteSugerencias(ServicioSoporteSugerencias.IServicioSoporteSugerencias ctx) {
-        singelton = Singleton.getInstance();
+    public ServicioMaps(ServicioMaps.IServicioMaps ctx) {
+        singleton = Singleton.getInstance();
         delegate = ctx;
         /*tcp = new TCP(singelton.ip, singelton.port);
         tcp.setTimeOut(25000);
         tcp.setSoTimeOut(25000);*/
         client = new DefaultHttpClient();
-        String url="https://www.solucionesonline.mx/apps_moviles/monitoreoNum/storedProcedure/spSoporte.php";
+        String url="https://solucionesonline.mx/apps_moviles/monitoreoNum/storedProcedure/coordsMapaApp.php";
         post = new HttpPost(url);
     }
 
     /**
      * Interface para manejar respuesta
      */
-    public interface IServicioSoporteSugerencias {
+    public interface IServicioMaps {
         /**
          * Se mandó paquete para Loguearse en la aplicación
          *
          * @param error
          * @param response
          */
-        void servicioSoporteSugerenciasFinished(int error, String response);
+        void servicioMapsFinished(int error, String response);
     }
 
     @Override
@@ -66,33 +66,34 @@ public class ServicioSoporteSugerencias extends AsyncTask<String, Integer, JSONO
                     error = ERROR_COMM;
                     response = "Error de comunicación con servidor";
                 }
-                singelton.nombreSoporte = result.getString("nombre");
-                singelton.mensajeSoporte = result.getString("mensaje");
-                delegate.servicioSoporteSugerenciasFinished(error, response);
+                singleton.coordLat = Double.parseDouble(result.getString("lat"));
+                singleton.coordLon = Double.parseDouble(result.getString("lon"));
+                delegate.servicioMapsFinished(error, response);
             }
         }catch (Exception e){
             e.printStackTrace();
             error = ERROR_COMM;
             response = "Error de comunicación con servidor 2";
-            delegate.servicioSoporteSugerenciasFinished(error, response);
+            delegate.servicioMapsFinished(error, response);
         }
     }
 
     @Override
     protected JSONObject doInBackground(String... params) {
-        return soporteSugerencias();
+        return obtenerCoordenadas();
     }
 
-    private JSONObject soporteSugerencias() {
+    private JSONObject obtenerCoordenadas() {
         //Date fecha = new Date();
         //String fechahora = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(fecha);
         error = ERROR_COMM;
         response = "Error de comunicación con servidor";
         try {
             List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-            pairs.add(new BasicNameValuePair("device",singelton.deviceId));
-            pairs.add(new BasicNameValuePair("nombre",singelton.nombreSoporte));
-            pairs.add(new BasicNameValuePair("mensaje",singelton.mensajeSoporte));
+            pairs.add(new BasicNameValuePair("device",singleton.deviceIdRecibido));
+            pairs.add(new BasicNameValuePair("accion",String.valueOf(singleton.opcionUbicacion)));
+            pairs.add(new BasicNameValuePair("lat",String.valueOf(singleton.coordLat)));
+            pairs.add(new BasicNameValuePair("lon",String.valueOf(singleton.coordLon)));
             post.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8"));
             HttpResponse httpResponse = client.execute(post);
             int status = httpResponse.getStatusLine().getStatusCode();
@@ -104,7 +105,6 @@ public class ServicioSoporteSugerencias extends AsyncTask<String, Integer, JSONO
                 error = SUCCESS;
                 response = "OK";
                 return last;
-
             }
         }catch (Exception e){
             e.printStackTrace();

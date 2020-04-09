@@ -23,7 +23,9 @@
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Darse de baja"/>
+                android:text="Darse de baja"
+                android:textColor="#fff"
+                android:background="@drawable/border_button_close"/>
         </LinearLayout>
     </RelativeLayout>
 

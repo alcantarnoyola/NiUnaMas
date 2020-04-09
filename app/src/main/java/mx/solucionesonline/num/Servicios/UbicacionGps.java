@@ -24,12 +24,13 @@ public class UbicacionGps extends MainActivity implements LocationListener {
         try {
             singleton.lat = loc.getLatitude();
             singleton.lon = loc.getLongitude();
-            String coordenadas = "Latitud = " + singleton.lon + "Longitud = " + singleton.lon;
+            String coordenadas = "Latitud = " + singleton.lat + "Longitud = " + singleton.lon;
             //Toast.makeText(mainContext, coordenadas, Toast.LENGTH_SHORT).show();
         }catch (Exception e){
             e.printStackTrace();
             singleton.lat = 22.152292;
             singleton.lon = -100.936622;
+            //Toast.makeText(mainContext, "error", Toast.LENGTH_SHORT).show();
         }
     }
 

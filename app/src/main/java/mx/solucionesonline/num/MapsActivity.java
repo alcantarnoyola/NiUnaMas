@@ -1,11 +1,16 @@
 package mx.solucionesonline.num;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
+import android.text.Layout;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -18,6 +23,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,24 +33,33 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-    public String [] coordsReceived = null;
-    public String response = ""; //recibimos respuesta de http
+import mx.solucionesonline.num.MapsDireccion.DownloadTask;
+import mx.solucionesonline.num.Servicios.ServicioMaps;
+import mx.solucionesonline.num.Servicios.UbicacionGps;
+
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, ServicioMaps.IServicioMaps {
+    private String [] coordsReceived = null;
+    private String response = ""; //recibimos respuesta de http
     public Singleton singleton;
-    public Thread coord;
-    public boolean firstMarker = false;
-    public int seconds = 0;
-    public Marker marcador;
-    public Marker marcadorCuidador;
-    public Handler handler;
-    public  CameraPosition cameraPosition;
-    public boolean moverCamara = true;
+    private Thread coord;
+    private boolean first= false;
+    private int seconds = 0;
+    //private Marker marcador;
+    private Marker marcadorCuidador;
+    private Handler handler;
+    private  CameraPosition cameraPosition;
+    private boolean moverCamara = true;
+    private Polyline polyline;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         singleton = Singleton.getInstance();
         uid();
+        activarProcesoGps();
+        singleton.mMap = null;
+        polyline = null;
+
         //codigo para recoger lo recibido desde link
         Intent intent = getIntent();
         if (intent != null && intent.getData() != null) {
@@ -55,6 +71,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             moverCamara = true;
             Toast.makeText(this, "Coordenadas recibidas: " + singleton.coordLat + "*****" + singleton.coordLon + "*****" + singleton.deviceIdRecibido, Toast.LENGTH_LONG).show();
         }//fin de recoger lo recibido por activity
+
         handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -70,78 +87,64 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
+    private void activarProcesoGps() {
+        try {
+            // permission already granted
+            singleton.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            singleton.locationListener = new UbicacionGps((MainActivity) singleton.context);
+            singleton.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, singleton.locationListener);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public void centrarCamara(){
         cameraPosition = CameraPosition.builder().target(
-                new LatLng(singleton.lat, singleton.lon)).zoom(16).bearing(0).tilt(45).build(); //asignamos coords a centrar el mapa
+                new LatLng(singleton.lat, singleton.lon)).zoom(18).bearing(0).tilt(45).build(); //asignamos coords a centrar el mapa
         singleton.mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         moverCamara = false;
+        Log.v("exception", "Centrando");
     }
 
     public void execThread(){
         if (singleton.mMap != null && singleton.statusAlertSms) {
             // al abrir activity mostramos coordenada recogida por sms
             seconds += 1000;
-            if (seconds > 15000 && singleton.statusAlertSms) {
-                if (marcador != null) {//borramos markador
-                    marcador.remove();
+            if (seconds > 15000 && singleton.statusAlertSms || !first) {
+                if (singleton.markerObjetivo != null) {//borramos markador
+                    singleton.markerObjetivo.remove();
                 }
+
+                first = true;
                 seconds = 0;
                 coordsReceived();
-                marcador = singleton.mMap.addMarker(new MarkerOptions().position(new LatLng(singleton.coordLat, singleton.coordLon)).title("Objetivo")); //creamos marker
+
             }
-            if(moverCamara)
-                centrarCamara();
 
         }
         if (singleton.mMap != null) {
             if (marcadorCuidador != null) {//borramos markador
                 marcadorCuidador.remove();
+                Log.v("exception", "borramos cuidador");
             }
+            if(polyline != null)
+                polyline.remove();
+
 
             if(singleton.lat != 0 && singleton.lon != 0) {
                 marcadorCuidador = singleton.mMap.addMarker(new MarkerOptions().position(new LatLng(singleton.lat, singleton.lon)).title("Cuidador")); //creamos marker
+                /*polyline = singleton.mMap.addPolyline(new PolylineOptions().add(new LatLng(singleton.lat,singleton.lon), new LatLng(singleton.coordLat, singleton.coordLon))
+                                                        .width(5).color(Color.RED));*/
                 if(moverCamara)
                     centrarCamara();
+                Log.v("exception" ,"** Entro bien");
             }
         }
     }
 
     public void coordsReceived(){
-        URL url = null;
-        try {
-            url = new URL("https://solucionesonline.mx/apps_moviles/monitoreoNum/coordsMapaApp.php?device="+singleton.deviceIdRecibido);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        HttpURLConnection urlConnection = null;
-        try {
-            urlConnection = (HttpURLConnection) url.openConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(urlConnection.getInputStream()));
-            // Acciones a realizar con el flujo de datos
-            String inputLine;
-            StringBuffer stringBuffer = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                stringBuffer.append(inputLine);
-            }
-            response = String.valueOf(stringBuffer);
-            String [] res = response.split("#");
-
-            if(!res[0].equals("-1")){ //si es diferente de -1 es que todo esta bien
-                singleton.coordLat = Double.parseDouble(res[1]);
-                singleton.coordLon = Double.parseDouble(res[2]);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        finally {
-            urlConnection.disconnect();
-        }
+        ServicioMaps servicioMaps = new ServicioMaps(MapsActivity.this);
+        servicioMaps.execute("");
     }
 
 
@@ -156,16 +159,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        if (singleton.mMap == null) {
-            singleton.mMap = googleMap;
-            singleton.mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        }
+        singleton.mMap = googleMap;
+        singleton.mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        marcadorCuidador = singleton.mMap.addMarker(new MarkerOptions().position(new LatLng(singleton.lat, singleton.lon)).title("Cuidador")); //creamos marker
 
-        if(singleton.statusAlertSms){
+
+
+        /*if(singleton.statusAlertSms){
             singleton.mMap = googleMap;
             singleton.mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-            centrarCamara();
-        }
+            //centrarCamara();
+        }*/
     }
     // method definition
     public BitmapDescriptor getMarkerIcon(String color) {
@@ -178,6 +182,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onBackPressed() {
         super.onBackPressed();
         handler.removeMessages(0); //detener hilo
+        singleton.locationManager.removeUpdates(singleton.locationListener);//detener location
     }
 
     public void uid(){
@@ -189,5 +194,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }catch (Exception e){
             uid();
         }
+    }
+
+    @Override
+    public void servicioMapsFinished(int error, String response) {
+        if (error == ServicioMaps.SUCCESS){
+            String url = obtenerDireccionesURL(marcadorCuidador.getPosition(), new LatLng(singleton.coordLat, singleton.coordLon));
+            DownloadTask downloadTask = new DownloadTask();
+            downloadTask.execute(url);
+            singleton.markerObjetivo = singleton.mMap.addMarker(new MarkerOptions().position(new LatLng(singleton.coordLat, singleton.coordLon)).title("Objetivo")); //creamos marker
+
+            Toast.makeText(this, "Ejecutando...", Toast.LENGTH_SHORT).show();
+        }else {
+            Toast.makeText(this, response, Toast.LENGTH_SHORT).show();
+        }
+
+
+
+    }
+
+    private String obtenerDireccionesURL(LatLng origin,LatLng dest){
+
+        String str_origin = "origin="+origin.latitude+","+origin.longitude;
+
+        String str_dest = "destination="+dest.latitude+","+dest.longitude;
+
+        String sensor = "sensor=false";
+        String key = "key=AIzaSyBB4pqVjDSsDtsoipSzwElBB4TMiK9sX-g";
+
+        String parameters = str_origin+"&"+str_dest+"&"+sensor+"&"+key;
+
+        String output = "json";
+
+        String url = "https://maps.googleapis.com/maps/api/directions/"+output+"?"+parameters;
+
+        return url;
     }
 }
